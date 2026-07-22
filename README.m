@@ -2,12 +2,10 @@
 % Data and Code for: McGaughey & Gold (2025)
 % "Sensory adaptation supports flexible evidence accumulation during perceptial decision making"
 
-% DOI: [insert DOI when available]
-
 % Data and code are available at: https://upenn.box.com/s/uvw64y7xu9zarn3ajd05igmya3a8893l
 % Code is available at: https://github.com/TheGoldLab/ms_2026_mcgaughey_gold_elife
 
-% Contact: mckar@pennmedicine.upenn.edu or jigold@pennmedicine.upenn.edu
+% Contact: jigold@pennmedicine.upenn.edu or kdmcgaughey@gmail.com
 % Last updated: 07/03/2026
 
 %% Dependencies
