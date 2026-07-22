@@ -34,9 +34,8 @@
 
 %% Load data
 cfg = projectDefaults();
-cd(cfg.paths.data)
 
-load('mergedTable_proc.mat')
+load(fullfile(cfg.paths.data, 'mergedTable_proc.mat'))
 
 % Subset data appropriately
 % "BP" = Sessions with behavior and pupil data

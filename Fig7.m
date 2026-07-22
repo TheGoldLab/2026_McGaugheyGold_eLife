@@ -58,22 +58,18 @@
 
 %% Load data
 cfg = projectDefaults();
-cd(cfg.paths.data)
+load(fullfile(cfg.paths.data, 'mergedTable_proc_core.mat')) % behavioral-only: skips Unit_1 and pupil traces (see buildMergedTableTiers.m)
+load(fullfile(cfg.paths.data, 'sensitivity_diff_labeled_NP.mat'))
 
-load('mergedTable_proc_core.mat') % behavioral-only: skips Unit_1 and pupil traces (see buildMergedTableTiers.m)
-load('sensitivity_diff_labeled_NP.mat')
+load(fullfile(cfg.paths.fits, 'LogisticFits_NeuralTerm.mat'))
+load(fullfile(cfg.paths.fits, 'LogisticFits_NeuralTerm_control.mat'))
+load(fullfile(cfg.paths.fits, 'LogisticFits_NeuralTerm_Rsq.mat'))
+load(fullfile(cfg.paths.fits, 'LogisticFits_NeuralTerm_Rsq_control.mat'))
 
-cd(cfg.paths.fits)
-
-load('LogisticFits_NeuralTerm.mat')
-load('LogisticFits_NeuralTerm_control.mat')
-load('LogisticFits_NeuralTerm_Rsq.mat')
-load('LogisticFits_NeuralTerm_Rsq_control.mat')
-
-load('LogisticFits_PupilTerm.mat')
-load('LogisticFits_PupilTerm_control.mat')
-load('LogisticFits_PupilTerm_Rsq.mat')
-load('LogisticFits_PupilTerm_Rsq_control.mat')
+load(fullfile(cfg.paths.fits, 'LogisticFits_PupilTerm.mat'))
+load(fullfile(cfg.paths.fits, 'LogisticFits_PupilTerm_control.mat'))
+load(fullfile(cfg.paths.fits, 'LogisticFits_PupilTerm_Rsq.mat'))
+load(fullfile(cfg.paths.fits, 'LogisticFits_PupilTerm_Rsq_control.mat'))
 
 % Subset data appropriately
 % "NP" = Sessions with behavior and pupil data

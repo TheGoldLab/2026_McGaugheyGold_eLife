@@ -31,11 +31,10 @@
 
 %% Load data
 cfg = projectDefaults();
-cd(cfg.paths.data)
 
-load('mergedTable_proc_neural.mat') % keeps Unit_1, skips pupil traces (see buildMergedTableTiers.m)
-load('sensitivity_diff_labeled_N.mat') % Neural subset
-load('normalizationTerm.mat') % Normalization term from session-wise neural analysis
+load(fullfile(cfg.paths.data, 'mergedTable_proc_neural.mat')) % keeps Unit_1, skips pupil traces (see buildMergedTableTiers.m)
+load(fullfile(cfg.paths.data, 'sensitivity_diff_labeled_N.mat')) % Neural subset
+load(fullfile(cfg.paths.data, 'normalizationTerm.mat')) % Normalization term from session-wise neural analysis
 
 % Subset data appropriately
 % "N" = Neural analysis

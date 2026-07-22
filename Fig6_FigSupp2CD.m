@@ -37,10 +37,9 @@
 
 %% Load data
 cfg = projectDefaults();
-cd(cfg.paths.data)
 
-load('mergedTable_proc.mat')
-load('sensitivity_diff_labeled_NP.mat') % Want sessions with neural and pupil data
+load(fullfile(cfg.paths.data, 'mergedTable_proc.mat'))
+load(fullfile(cfg.paths.data, 'sensitivity_diff_labeled_NP.mat')) % Want sessions with neural and pupil data
 
 % Subset data appropriately
 % "NP" = Sessions with neural and pupil data

@@ -24,22 +24,19 @@
 %% Load data
 cfg = projectDefaults();
 
-cd(cfg.paths.data)
-load('mergedTable_proc_core.mat') % behavioral-only: skips Unit_1 and pupil traces (see buildMergedTableTiers.m)
+load(fullfile(cfg.paths.data, 'mergedTable_proc_core.mat')) % behavioral-only: skips Unit_1 and pupil traces (see buildMergedTableTiers.m)
 
 % Subset data appropriately
 % "B" = Behavioral analysis
 [mergedTableSub] = createDatSubset(mergedTable_proc, 'B');
 dat = mergedTableSub;
 
-cd(cfg.paths.fits)
-
 % Load pseudo R^2 for logistic fit assessment
-load('LogisticFits.mat')
-load('LogisticFits_Rsq.mat')
+load(fullfile(cfg.paths.fits, 'LogisticFits.mat'))
+load(fullfile(cfg.paths.fits, 'LogisticFits_Rsq.mat'))
 
-load('LogisticFits_Shuffle.mat')
-load('LogisticFits_Rsq_Shuffle.mat')
+load(fullfile(cfg.paths.fits, 'LogisticFits_Shuffle.mat'))
+load(fullfile(cfg.paths.fits, 'LogisticFits_Rsq_Shuffle.mat'))
 
 %% Index fits by animal
 uniqueSessionNames = unique(dat.ses_ID);

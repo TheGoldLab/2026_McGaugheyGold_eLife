@@ -51,11 +51,9 @@
 %% Load data
 cfg = projectDefaults();
 
-cd(cfg.paths.data)
-load('mergedTable_proc_core.mat') % behavioral-only: skips Unit_1 and pupil traces (see buildMergedTableTiers.m)
+load(fullfile(cfg.paths.data, 'mergedTable_proc_core.mat')) % behavioral-only: skips Unit_1 and pupil traces (see buildMergedTableTiers.m)
 
-cd(cfg.paths.fits)
-load('LogisticFits.mat')
+load(fullfile(cfg.paths.fits, 'LogisticFits.mat'))
 
 % Subset data appropriately
 % "B" = Behavioral analysis
@@ -88,86 +86,87 @@ co = cfg.colors.pair;
     % An: ss = 28
     % Ch: ss = 58
     % Mi: ss = 142
-
-% Change session number:
-ss = 142;
-
-disp(uniqueSessionNames{ss})
-
-% Get the data to fit:
-%   1. hazard
-%   2. test coherence
-%   3. prefinal direction
-%   4. final direction
-%   5. test duration
-%   6. choice (1=right, 2=left)
-
-Lses = strcmp(dat.ses_ID, uniqueSessionNames{ss}) & ...
-    dat.coh_final >= 50;
-
-session_data = table2array(dat(Lses, [2 4 7 6 9 10]));
-
-% For data_to_fit
-LdirSwitch = session_data(:,3) ~= session_data(:,4);
-LpreDirIsRight = session_data(:,3) < 90 | session_data(:,3) >= 270;
-Lpre = [LpreDirIsRight ~LpreDirIsRight];
-LchoseRight = session_data(:,6) == 1;
-
-% Set up data matrix
-%  1. Switch/stay bias ... column of ones
-%  2. Right/left bias ... 0 when prefinal dir=L, 1 when prefinal dir=R
-%  3. Signed time ... neg=non-switch, pos=switch
-%  4. Choice ... 0/1 = did not/did choose prefinal dir
-
-data_to_fit = ones(sum(Lses), 4);
-data_to_fit(~LpreDirIsRight, 2) = 0;
-data_to_fit(:,3) = session_data(:,5);
-data_to_fit(~LdirSwitch,3) = -data_to_fit(~LdirSwitch,3);
-data_to_fit(LpreDirIsRight & LchoseRight,4) = 0; % prefinal dir = R and chose R
-data_to_fit(LpreDirIsRight &~LchoseRight,4) = 1; % prefinal dir = R and chose L
-data_to_fit(~LpreDirIsRight& LchoseRight,4) = 1; % prefinal dir = L and chose R
-data_to_fit(~LpreDirIsRight&~LchoseRight,4) = 0; % prefinal dir = L and chose L
-
-% Fit/plot separately for each hazard
+example_sessions = [28 58 142];
+num_examples = length(example_sessions);
 figure(3); clf
-for hh = 1:2
-    Lhazard = session_data(:,1) == uniqueHazards(hh);
+for si = 1:num_examples
+    ss = example_sessions(si);
+    disp(uniqueSessionNames{ss})
 
-    % Get the fit
-    if sum(Lhazard) > 20
+    % Get the data to fit:
+    %   1. hazard
+    %   2. test coherence
+    %   3. prefinal direction
+    %   4. final direction
+    %   5. test duration
+    %   6. choice (1=right, 2=left)
 
-         fit_y = logistValDotsrev(fits(ss,:,hh)', data_to_fit(Lhazard,1:end-1));
-         R_sq(ss,hh) = abs(mean(fit_y(data_to_fit(Lhazard,4) == 1,:)) -  mean(fit_y(data_to_fit(Lhazard,4) == 0,:)));
+    Lses = strcmp(dat.ses_ID, uniqueSessionNames{ss}) & ...
+        dat.coh_final >= 50;
 
-        % Plot it separately for predir=L and predir=R
-        for xx = 1:2
-            subplot(1,2,xx); hold on; box on
-            plot([0 0], [0 1], 'k--');
-            plot(xax([1 end]), [0.5 0.5], 'k--', 'MarkerSize', 15);
+    session_data = table2array(dat(Lses, [2 4 7 6 9 10]));
 
-            % Show smoothed data
-            [sorted_time_axis, I] = sort(data_to_fit(Lhazard&Lpre(:,xx), 3));
-            choice_data = data_to_fit(Lhazard&Lpre(:,xx), 4);
-            sorted_choice_data = choice_data(I);
-            plot(sorted_time_axis, nanrunmean(sorted_choice_data,5), ':', 'Color', co{hh});
+    % For data_to_fit
+    LdirSwitch = session_data(:,3) ~= session_data(:,4);
+    LpreDirIsRight = session_data(:,3) < 90 | session_data(:,3) >= 270;
+    Lpre = [LpreDirIsRight ~LpreDirIsRight];
+    LchoseRight = session_data(:,6) == 1;
 
-            if xx==1
-                title(sprintf('Prefinal dir=R, h=%d', uniqueHazards(hh)))
-                ylabel('Fraction choose Left')
-            else
-                title(sprintf('Prefinal dir=L, h=%d', uniqueHazards(hh)))
-                ylabel('Fraction choose Right')
+    % Set up data matrix
+    %  1. Switch/stay bias ... column of ones
+    %  2. Right/left bias ... 0 when prefinal dir=L, 1 when prefinal dir=R
+    %  3. Signed time ... neg=non-switch, pos=switch
+    %  4. Choice ... 0/1 = did not/did choose prefinal dir
+
+    data_to_fit = ones(sum(Lses), 4);
+    data_to_fit(~LpreDirIsRight, 2) = 0;
+    data_to_fit(:,3) = session_data(:,5);
+    data_to_fit(~LdirSwitch,3) = -data_to_fit(~LdirSwitch,3);
+    data_to_fit(LpreDirIsRight & LchoseRight,4) = 0; % prefinal dir = R and chose R
+    data_to_fit(LpreDirIsRight &~LchoseRight,4) = 1; % prefinal dir = R and chose L
+    data_to_fit(~LpreDirIsRight& LchoseRight,4) = 1; % prefinal dir = L and chose R
+    data_to_fit(~LpreDirIsRight&~LchoseRight,4) = 0; % prefinal dir = L and chose L
+
+    % Fit/plot separately for each hazard
+    for hh = 1:2
+        Lhazard = session_data(:,1) == uniqueHazards(hh);
+
+        % Get the fit
+        if sum(Lhazard) > 20
+
+            fit_y = logistValDotsrev(fits(ss,:,hh)', data_to_fit(Lhazard,1:end-1));
+            R_sq(ss,hh) = abs(mean(fit_y(data_to_fit(Lhazard,4) == 1,:)) -  mean(fit_y(data_to_fit(Lhazard,4) == 0,:)));
+
+            % Plot it separately for predir=L and predir=R
+            for xx = 1:2
+                subplot(num_examples,2,(si-1)*2+xx); hold on; box on
+                plot([0 0], [0 1], 'k--');
+                plot(xax([1 end]), [0.5 0.5], 'k--', 'MarkerSize', 15);
+
+                % Show smoothed data
+                [sorted_time_axis, I] = sort(data_to_fit(Lhazard&Lpre(:,xx), 3));
+                choice_data = data_to_fit(Lhazard&Lpre(:,xx), 4);
+                sorted_choice_data = choice_data(I);
+                plot(sorted_time_axis, nanrunmean(sorted_choice_data,5), ':', 'Color', co{hh});
+
+                if xx==1
+                    title(sprintf('Prefinal dir=R, h=%d', uniqueHazards(hh)))
+                    ylabel('Fraction choose Left')
+                else
+                    title(sprintf('Prefinal dir=L, h=%d', uniqueHazards(hh)))
+                    ylabel('Fraction choose Right')
+                end
+
+                xlabel('Signed time (-non_switch, +switch)');
+
+                % Show fits
+                ys = logistValDotsrev(fits(ss,:,hh)', show_fit_data(:,:,xx));
+                plot(xax, ys, '-', 'Color', co{hh}, 'LineWidth', 2);
+                axis([xax(1) xax(end) 0 1]);
+
+                % Calculate y-intercept (bias)
+                bias(ss,xx,hh) = 0.5 - ys(1201);
             end
-
-            xlabel('Signed time (-non_switch, +switch)');
-
-            % Show fits
-            ys = logistValDotsrev(fits(ss,:,hh)', show_fit_data(:,:,xx));
-            plot(xax, ys, '-', 'Color', co{hh}, 'LineWidth', 2);
-            axis([xax(1) xax(end) 0 1]);
-
-            % Calculate y-intercept (bias)
-            bias(ss,xx,hh) = 0.5 - ys(1201);
         end
     end
 end
