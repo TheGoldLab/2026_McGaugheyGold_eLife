@@ -114,6 +114,16 @@ fits_control = nans(numUnits, 4, 2);
 R_sq = nans(numUnits, 1, 2);
 R_sq_control = nans(numUnits, 1, 2);
 
+% Extracted single-term outputs (see end of unit loop below). Preallocated
+% with NaN so that units skipped in the loop (Monkey Ch; see the skip
+% check below) stay NaN rather than being auto-grown to 0 by MATLAB when
+% a later unit's assignment extends the array past them.
+
+fits_neuralTerm = nans(numUnits, 1, 2);
+R_sq_neuralTerm = nans(numUnits, 1, 2);
+fits_neuralTerm_control = nans(numUnits, 1, 2);
+R_sq_neuralTerm_control = nans(numUnits, 1, 2);
+
 % Plotting controls:
 
 colors = cfg.colors.pair;
@@ -454,5 +464,15 @@ for uu = 1:numUnits
         R_sq_neuralTerm(uu,1,:) = R_sq(uu,1,:);
     end
 
-    clear FR_testing_stim_idx FR_testing_stim FR_testing_stim_dir_idx FR_testing FR_dir_idx 
+    clear FR_testing_stim_idx FR_testing_stim FR_testing_stim_dir_idx FR_testing FR_dir_idx
 end
+
+%% Saved output
+
+% if control
+%     save('LogisticFits_NeuralTerm_control.mat', 'fits_neuralTerm_control')
+%     save('LogisticFits_NeuralTerm_Rsq_control.mat', 'R_sq_neuralTerm_control')
+% else
+%     save('LogisticFits_NeuralTerm.mat', 'fits_neuralTerm')
+%     save('LogisticFits_NeuralTerm_Rsq.mat', 'R_sq_neuralTerm')
+% end

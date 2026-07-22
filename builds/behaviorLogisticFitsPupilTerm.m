@@ -122,6 +122,16 @@ fits_control = nans(numUnits, 4, 2);
 R_sq = nans(numUnits, 1, 2);
 R_sq_control = nans(numUnits, 1, 2);
 
+% Extracted single-term outputs (see end of unit loop below). Preallocated
+% with NaN so that units skipped in the loop (Monkey Ch; see the skip
+% check below) stay NaN rather than being auto-grown to 0 by MATLAB when
+% a later unit's assignment extends the array past them.
+
+fits_pupilTerm = nans(numUnits, 1, 2);
+R_sq_pupilTerm = nans(numUnits, 1, 2);
+fits_pupilTerm_control = nans(numUnits, 1, 2);
+R_sq_pupilTerm_control = nans(numUnits, 1, 2);
+
 % Plotting controls:
 
 colors = cfg.colors.pair;
@@ -395,10 +405,6 @@ for uu = 1:numUnits
     end
 
     if control
-        % NOTE: was reading from fits/R_sq here (a copy-paste leftover from
-        % the non-control branch) instead of fits_control/R_sq_control --
-        % since fits/R_sq are only ever populated in the else branch below,
-        % this silently produced all-NaN fits_pupilTerm_control output.
         fits_pupilTerm_control(uu,1,:) = fits_control(uu,3,:);
         R_sq_pupilTerm_control(uu,1,:) = R_sq_control(uu,1,:);
     else
@@ -408,3 +414,13 @@ for uu = 1:numUnits
 
     clear pupil_data_evoked pupil_evoked_bin pupil_baseline_resid
 end
+
+%% Saved output
+
+% if control
+%     save('LogisticFits_PupilTerm_control.mat', 'fits_pupilTerm_control')
+%     save('LogisticFits_PupilTerm_Rsq_control.mat', 'R_sq_pupilTerm_control')
+% else
+%     save('LogisticFits_PupilTerm.mat', 'fits_pupilTerm')
+%     save('LogisticFits_PupilTerm_Rsq.mat', 'R_sq_pupilTerm')
+% end

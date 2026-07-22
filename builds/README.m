@@ -182,3 +182,51 @@
     % call pattern is covered by the isequaln test in (1), and its own
     % loop-reorder fix was independently validated via the full run
     % documented above.
+
+%% Correction (2026-07-21): Ch-monkey rows silently zero, not NaN
+    % A Dryad reviewer flagged an inconsistency in the numeric matrices for
+    % LogisticFits_PupilTerm_Rsq.mat and related files. Investigation found
+    % a second, separate bug from the one described above under
+    % behaviorLogisticFitsPupilTerm.m: in both behaviorLogisticFitsPupilTerm.m
+    % and behaviorLogisticFitsNeuralTerm.m, the four saved single-term
+    % outputs (fits_pupilTerm, R_sq_pupilTerm, fits_pupilTerm_control,
+    % R_sq_pupilTerm_control, and their neuralTerm equivalents) were never
+    % preallocated with nans(numUnits,...) the way fits/fits_control/R_sq/
+    % R_sq_control are. Monkey Ch is deliberately excluded from these
+    % per-unit fits (see the skip check near the top of each unit loop) via
+    % `continue`, which skips the assignment for that row entirely. Because
+    % Ch's 13 sessions land at a contiguous block (rows 54-66 of the 153
+    % NP-subset units) and later units still get assigned, MATLAB's
+    % auto-grow-on-assignment silently zero-fills those intermediate rows
+    % instead of leaving them NaN. This affected all 8 checked-in files
+    % (LogisticFits_{Pupil,Neural}Term{,_control}{,_Rsq}{,_Rsq_control}.mat)
+    % -- confirmed by direct inspection (26/306 = rows 54-66 x 2 hazards
+    % exactly zero in every one of them) and reproduced identically across
+    % fresh, independent MATLAB sessions, ruling out workspace/run-order
+    % contamination as the cause.
+    %
+    % Fix: preallocated all four variables with nans(numUnits, 1, 2) at the
+    % top of both scripts, alongside the existing fits/fits_control/R_sq/
+    % R_sq_control preallocation. Also added (commented-out, matching the
+    % convention in behaviorLogisticFits.m) save() calls at the end of both
+    % scripts, since neither previously had any -- the checked-in .mat files
+    % had only ever been produced by manually saving from the workspace.
+    %
+    % Regenerated all 8 files (both control states x both scripts). Ch rows
+    % are now NaN as intended (verified: 26/26 NaN in the Ch block, 0
+    % elsewhere). Non-Ch values differ from the previous cache by the same
+    % run-to-run GlobalSearch variation documented above (e.g.
+    % fits_neuralTerm_control r=0.986 vs. the 0.988 measured on 2026-07-03;
+    % fits_pupilTerm_Rsq r=0.999) -- consistent with a fresh stochastic
+    % refit, not a new defect. n=280 (140 non-Ch units x 2 hazards) in every
+    % correlation check, confirming the Ch exclusion now behaves correctly.
+    % Pre-fix files backed up to data/behaviorFits/_pre_Ch_NaN_fix_backup_20260721/
+    % before being overwritten.
+    %
+    % Note this also means the "306/306 populated" and "0 diff across all
+    % 306 entries" claims in the 2026-07-03 entry above were never actually
+    % achievable -- 26 of those 306 entries are Ch-monkey rows that should
+    % correctly be NaN (missing), not populated. That entry's fix (the
+    % fits/R_sq vs. fits_control/R_sq_control read) was real and distinct
+    % from this one; its "306/306" bookkeeping just predates this
+    % correction.
