@@ -5,7 +5,7 @@
 % DOI: [insert DOI when available]
 
 % Data and code are available at: https://upenn.box.com/s/uvw64y7xu9zarn3ajd05igmya3a8893l
-% Code is available at: https://github.com/TheGoldLab/2026_McGaugheyGold_eLife
+% Code is available at: https://github.com/TheGoldLab/ms_2026_mcgaughey_gold_elife
 
 % Contact: mckar@pennmedicine.upenn.edu or jigold@pennmedicine.upenn.edu
 % Last updated: 07/03/2026
